@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>LabBIM FAU USP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --linha-ativa: #1a73e8;
+    --linha-inativa: #222;
+    --bg-fundo: #111;
+    
+    --x-labbim: 40px;
+    --x-inicio: 150px;
+    --x-metodo: 260px;
+    --x-acervo: 370px;
+    --x-producao: 480px;
+    --x-contato: 590px;
+    
+    --gap-linha: 10px; 
+    --espessura-linha: 2px;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--bg-fundo);
+    color: #eee;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+html { scroll-behavior: smooth; }
+
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: var(--bg-fundo);
+    z-index: 1000;
+    height: 70px;
+}
+
+nav {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+}
+
+nav a {
+    text-decoration: none;
+    color: #aaa;
+    font-size: 13px;
+    position: absolute;
+    transition: color 0.3s;
+}
+
+nav a:nth-child(1) { left: var(--x-labbim); font-weight: bold; font-size: 16px; color: #fff; }
+nav a:nth-child(2) { left: var(--x-inicio); }
+nav a:nth-child(3) { left: var(--x-metodo); }
+nav a:nth-child(4) { left: var(--x-acervo); }
+nav a:nth-child(5) { left: var(--x-producao); }
+nav a:nth-child(6) { left: var(--x-contato); }
+
+nav a:not(:first-child)::before {
+    content: "";
+    position: absolute;
+    left: calc(-1 * var(--gap-linha)); 
+    top: 0; 
+    width: var(--espessura-linha);
+    height: 45px; 
+    background: var(--linha-inativa);
+    transition: background 0.3s;
+}
+
+nav a.ativo::before { background: var(--linha-ativa); }
+nav a.ativo { color: #fff; }
+
+main { padding-top: 70px; }
+
+section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 20px 0;
+    scroll-margin-top: 70px; 
+}
+
+section::before {
+    content: "";
+    position: absolute;
+    width: var(--espessura-linha);
+    top: -100px;
+    bottom: 110px; 
+    background: var(--linha-inativa);
+    transition: background 0.3s;
+    left: calc(-1 * var(--gap-linha));
+    z-index: 1;
+}
+
+#inicio::before { top: -35px; }
+
+section.ativa::before { background: var(--linha-ativa); }
+
+#inicio   { margin-left: var(--x-inicio); }
+#metodo   { margin-left: var(--x-metodo); }
+#acervo   { margin-left: var(--x-acervo); }
+#producao { margin-left: var(--x-producao); }
+#contato  { margin-left: var(--x-contato); }
+
+h1 { font-size: clamp(20px, 3.5vw, 25px); margin: 0 0 20px 0; width: 85%; line-height: 1.2; }
+h2 { font-size: 20px; margin-bottom: 15px; }
+p { color: #ccc; max-width: 800px; margin-bottom: 20px; font-size: 14px; white-space: pre-line; }
+
+p a {
+    color: var(--linha-ativa);
+    text-decoration: none;      
+    font-weight: normal;
+    transition: 0.3s;
+    border-bottom: 1px solid transparent; 
+}
+
+p a:hover {
+    color: #6da3da;
+    border-bottom: 1px solid #6da3da;
+}
+</style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="#">LabBIM</a>
+        <a href="#inicio">Início</a>
+        <a href="#metodo">Método</a>
+        <a href="#acervo">Acervo</a>
+        <a href="#producao">Produção</a>
+        <a href="#contato">Contato</a>
+    </nav>
+</header>
+
+<main>
+    <!-- As seções estão vazias pois serão preenchidas pelos arquivos da pasta 'conteudo' -->
+    <section id="inicio"></section>
+    <section id="metodo"></section>
+    <section id="acervo"></section>
+    <section id="producao"></section>
+    <section id="contato"></section>
+</main>
+
+<script>
+    // 1. Script para carregar os conteúdos externos
+    async function carregarConteudo(idSecao, caminhoArquivo) {
+        try {
+            const resposta = await fetch(caminhoArquivo);
+            if (resposta.ok) {
+                const conteudo = await resposta.text();
+                document.getElementById(idSecao).innerHTML = conteudo;
+            } else {
+                console.error(`Erro ao carregar ${caminhoArquivo}`);
+                document.getElementById(idSecao).innerHTML = `<p>Erro ao carregar o conteúdo.</p>`;
+            }
+        } catch (erro) {
+            console.error(`Erro de rede ao carregar ${caminhoArquivo}`, erro);
+        }
+    }
+
+    // Dispara o carregamento assim que a página é lida pelo navegador
+    document.addEventListener("DOMContentLoaded", () => {
+        carregarConteudo('inicio', 'conteudo/inicio.html');
+        carregarConteudo('metodo', 'conteudo/metodo.html');
+        carregarConteudo('acervo', 'conteudo/acervo.html');
+        carregarConteudo('producao', 'conteudo/producao.html');
+        carregarConteudo('contato', 'conteudo/contato.html');
+    });
+
+    // 2. O seu script original de atualização do menu (Scroll)
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('nav a');
+
+    function updateActiveState() {
+        let current = "";
+        const scrollPos = window.scrollY;
+
+        if (scrollPos < 100) {
+            current = "inicio";
+        } else {
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (scrollPos >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+        }
+
+        sections.forEach(section => {
+            section.classList.remove('ativa');
+            if (section.getAttribute('id') === current) {
+                section.classList.add('ativa');
+            }
+        });
+
+        navLinks.forEach((link, index) => {
+            link.classList.remove('ativo');
+            const href = link.getAttribute('href');
+            if (current === "inicio") {
+                if (index === 0 || index === 1) link.classList.add('ativo');
+            } else if (href === `#${current}`) {
+                link.classList.add('ativo');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', updateActiveState);
+    updateActiveState(); // roda uma vez no início
+</script>
+</body>
+</html>
